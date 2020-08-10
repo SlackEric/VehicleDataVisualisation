@@ -58,11 +58,6 @@ const store = new Vuex.Store({
 
 			state.vehicleTotal = total;
 			state.avgMakeConfidence = (confidenceTotal / total).toFixed(2);
-
-			console.log(state.vehicleTotal);
-
-			console.log('make chart data');
-			console.log(state.MakeChartData);
 		}
 	},
 	actions: {

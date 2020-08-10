@@ -73,20 +73,8 @@ export default {
 				vehiclesAll: false,
 				districts: []
 			};
-			console.log(params);
-			// this.$q.loading.show();
 
 			store.dispatch('fetchVehicleData', params);
-
-			/*
-			this.$axios.post('/api/v1/search/search', params)
-				.then((response) => {
-					this.$q.loading.hide();
-					store.commit('updateVehicleData', response.data);
-				}).catch(() => {
-					this.$q.loading.hide();
-				});
-				*/
 		}
 	}
 };
