@@ -7,14 +7,6 @@ const axiosInstance = axios.create({
 	}
 });
 
-/*
-axiosInstance.interceptors.request.use(config => {
-	const token = localStorage.getItem('token') || '';
-	config.headers.Authorization = token;
-	return config;
-});
-*/
-
 export default ({ Vue }) => {
 	Vue.prototype.$axios = axiosInstance;
 };

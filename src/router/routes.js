@@ -1,6 +1,6 @@
 
 import LoginPage from 'pages/Login';
-import HomePage from 'pages/Home';
+import HomePage from 'pages/Index';
 
 const isAuthenticated = () => {
 	if (localStorage.getItem('token')) {
@@ -11,15 +11,6 @@ const isAuthenticated = () => {
 };
 
 const routes = [
-	/*
-	{
-		path: '/',
-		component: () => import('layouts/MainLayout.vue'),
-		children: [
-			{ path: '', component: () => import('pages/Index.vue') }
-		]
-	},
-	*/
 	{
 		path: '/',
 		component: () => import('layouts/MainLayout.vue'),
