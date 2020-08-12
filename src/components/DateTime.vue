@@ -1,5 +1,5 @@
 <template>
-	<q-input filled @input="sendDateTimeToParent" v-model="dateTime" v-bind:label="labelText">
+	<q-input @input="sendDateTimeToParent" v-model="dateTime" v-bind:label="labelText">
 		<template v-slot:prepend>
 			<q-icon name="event" class="cursor-pointer">
 				<q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">

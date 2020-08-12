@@ -1,10 +1,10 @@
 import axios from 'axios';
+import router from '../router';
 import { Loading, LocalStorage } from 'quasar';
 
 const baseURL = 'https://testing-api.aeroranger.com';
 const headers = {
 	'Content-Type': 'application/json'
-	// Authorization: 'Bearer ' + LocalStorage.getItem('token') || ''
 };
 
 const axiosInstance = axios.create({
@@ -26,5 +26,9 @@ export default function request (options) {
 			Loading.hide();
 			return response;
 		})
-		.catch(error => error);
+		.catch(error => {
+			Loading.hide();
+			router().push('/login');
+			return error;
+		});
 };

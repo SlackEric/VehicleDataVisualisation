@@ -9,6 +9,7 @@ Vue.use(Vuex);
 
 const backgroundColor = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(20, 255, 208, 0.2)', 'rgba(255, 228, 20, 0.2)', 'rgba(255, 153, 20, 0.2)', 'rgba(255, 20, 169, 0.2)'];
 const borderColor = ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(20, 255, 208, 1)', 'rgba(255, 228, 20, 1)', 'rgba(255, 153, 20, 1)', 'rgba(255, 20, 169, 1)'];
+const imagePageSize = 10;
 
 function getVehiclesOverTimeData (result) {
 	const processedData = [];
@@ -45,9 +46,13 @@ const store = new Vuex.Store({
 		vehicleData: [],
 		makeChartData: null,
 		vehiclesOverTimeData: null,
+		imageData: [],
 		vehicleTotal: 0,
 		avgMakeConfidence: 0,
-		mostPopularPlate: ''
+		mostPopularPlate: 'None',
+		currentImagePage: 1,
+		maxImagePageSize: 1,
+		isTableShown: true
 	},
 	mutations: {
 		updateFilter (state, filter) {
@@ -128,6 +133,22 @@ const store = new Vuex.Store({
 				.splice(0, 1);
 
 			state.mostPopularPlate = plateData[0].key;
+
+			state.maxImagePageSize = Math.ceil(state.vehicleData.length / imagePageSize);
+			store.commit('updateImageData');
+		},
+		updateTableStatus (state, isTableShown) {
+			state.isTableShown = isTableShown;
+		},
+		updateImageData (state) {
+			const startIndex = (store.state.currentImagePage - 1) * imagePageSize;
+			const endIndex = store.state.currentImagePage * imagePageSize;
+
+			state.imageData = state.vehicleData.slice(startIndex, endIndex).map(vehicle => ({ id: vehicle.id, url: vehicle.image }));
+		},
+		updateCurrentImagePage (state, page) {
+			state.currentImagePage = page;
+			store.commit('updateImageData');
 		}
 	},
 	actions: {

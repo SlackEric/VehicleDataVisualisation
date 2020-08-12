@@ -12,17 +12,19 @@
 					<widget :widget="mostPopularPlateWidget" :content="mostPopularPlate"/>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-4 col-xs-12">
+			<div class="row q-gutter-md">
+				<div class="col-lg-5 col-xs-12 border">
 					<make-chart v-bind:chart-data="makeChartData" :options="makeChartOptions"/>
 				</div>
-				<div class="col-lg-6 col-xs-12">
+				<div class="col-lg-6 col-xs-12 border">
 					<vehicles-over-time v-bind:chart-data="vehiclesOverTimeData" :options="vehiclesOverTimeOptions"/>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col">
-					<result-table :data="vehicleData"/>
+				<div class="col-lg-11 col-md-11 q-gutter-md">
+					<results-header />
+					<result-table v-if="isTableShown" :data="vehicleData"/>
+					<images-view v-else />
 				</div>
 			</div>
 		</div>
@@ -30,12 +32,16 @@
 </template>
 
 <style lang="scss">
-
+	.border{
+		border: 1px solid rgb(211, 207, 207)
+	}
 </style>
 
 <script>
 import VehiclesOverTime from '../components/VehiclesOverTime';
 import ResultTable from '../components/ResultTable';
+import ImagesView from '../components/ImagesView';
+import ResultsHeader from '../components/ResultsHeader';
 import MakeChart from '../components/MakeChart';
 import Widget from '../components/Widget';
 import store from '../store';
@@ -75,8 +81,10 @@ export default {
 	},
 	components: {
 		VehiclesOverTime,
+		ImagesView,
 		Widget,
 		MakeChart,
+		ResultsHeader,
 		ResultTable
 	},
 	preFetch ({ store }) {
@@ -100,6 +108,9 @@ export default {
 		},
 		vehiclesOverTimeData () {
 			return store.state.vehiclesOverTimeData !== null ? store.state.vehiclesOverTimeData : {};
+		},
+		isTableShown () {
+			return store.state.isTableShown;
 		}
 	}
 };

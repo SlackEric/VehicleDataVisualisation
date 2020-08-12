@@ -1,10 +1,11 @@
 <template>
-	<q-table title="Result" :data="data" :columns="columns" :pagination.sync="pagination">
+	<q-table :data="data" :columns="columns" :pagination.sync="pagination">
 	</q-table>
 </template>
 
 <script>
 import moment from 'moment';
+import store from '../store';
 
 export default {
 	props: ['data'],
@@ -45,6 +46,11 @@ export default {
 			}
 			]
 		};
+	},
+	methods: {
+		showImages () {
+			store.commit('updateTableStatus', false);
+		}
 	}
 };
 </script>
