@@ -9,19 +9,19 @@
 		<template v-slot:body-cell-Plate="props">
 			<q-td :props="props" class="tooltip">
 				<span>{{props.row.plate}}</span>
-				<img :src="props.row.imagePlate" class="tooltipImg"/>
+				<img :src="props.row.imagePlate" class="plate-image-tooltip"/>
 			</q-td>
 		</template>
 		<template v-slot:body-cell-Colour="props">
 			<q-td :props="props" class="tooltip">
 				<span>{{props.row.vehicleColour}}</span>
-				<img :src="props.row.image" class="tooltipImg"/>
+				<img :src="props.row.image" class="full-image-tooltip"/>
 			</q-td>
 		</template>
 		<template v-slot:body-cell-Make="props">
 			<q-td :props="props" class="tooltip">
 				<span>{{props.row.vehicleMake}}</span>
-				<img :src="props.row.image" class="tooltipImg"/>
+				<img :src="props.row.image" class="full-image-tooltip"/>
 			</q-td>
 		</template>
 	</q-table>
@@ -110,16 +110,24 @@
 .tooltip {
 	position: relative;
 }
-.tooltipImg {
+.plate-image-tooltip {
 	visibility: hidden;
 	width: 120px;
 	border-radius: 6px;
-
-	/* Position the tooltip */
 	position: absolute;
 	z-index: 1;
 }
-.tooltip:hover .tooltipImg {
+.full-image-tooltip {
+	visibility: hidden;
+	width: 250px;
+	border-radius: 6px;
+	position: absolute;
+	z-index: 1;
+}
+.tooltip:hover .plate-image-tooltip {
+	visibility: visible;
+}
+.tooltip:hover .full-image-tooltip {
 	visibility: visible;
 }
 
