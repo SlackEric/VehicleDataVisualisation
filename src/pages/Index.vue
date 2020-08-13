@@ -1,7 +1,7 @@
 <template>
 	<q-page>
 		<div class="q-ma-sm row justify-center">
-			<div class="q-gutter-md col-lg-11 col-md-7 col-xs-10">
+			<div class="q-gutter-md col-lg-11 col-md-8 col-xs-10">
 				<div class="row q-col-gutter-sm">
 					<div class="col-xs-9 col-md-4 col-lg-3">
 						<widget :widget="vehicleTotalWidget" :content="vehicleTotal"/>
