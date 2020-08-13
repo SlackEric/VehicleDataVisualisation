@@ -4,7 +4,8 @@ import { Loading, LocalStorage } from 'quasar';
 
 const baseURL = 'https://testing-api.aeroranger.com';
 const headers = {
-	'Content-Type': 'application/json'
+	'Content-Type': 'application/json',
+	'Access-Control-Allow-Origin': '*'
 };
 
 const axiosInstance = axios.create({

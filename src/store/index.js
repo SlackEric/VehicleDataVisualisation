@@ -10,14 +10,29 @@ Vue.use(Vuex);
 const backgroundColor = ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(20, 255, 208, 0.2)', 'rgba(255, 228, 20, 0.2)', 'rgba(255, 153, 20, 0.2)', 'rgba(255, 20, 169, 0.2)'];
 const borderColor = ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)', 'rgba(255, 159, 64, 1)', 'rgba(20, 255, 208, 1)', 'rgba(255, 228, 20, 1)', 'rgba(255, 153, 20, 1)', 'rgba(255, 20, 169, 1)'];
 const imagePageSize = 10;
+const duration = 4;
 
-function getVehiclesOverTimeData (result) {
+function getVehiclesOverTimeData (result, hourLabels) {
 	const processedData = [];
 
 	result.forEach(row => {
 		const vector = d3.nest().key(d => d.date).rollup(leaves => leaves.length).entries(row.values);
-		vector.sort((a, b) => { return Date(a.key) - Date(b.key); }).reverse();
-		processedData.push({ make: row.make, values: vector.map(element => element.value) });
+		const tuple = [];
+
+		let i = 0;
+		let j = vector.length - 1;
+
+		while (i < hourLabels.length && j >= 0) {
+			if (hourLabels[i] !== vector[j].key) {
+				tuple.push(0);
+			} else {
+				tuple.push(vector[j].value);
+				j--;
+			}
+			i++;
+		}
+
+		processedData.push({ make: row.make, values: tuple });
 	});
 
 	const shownDataSet = [];
@@ -33,7 +48,7 @@ const store = new Vuex.Store({
 	state: {
 		filter: {
 			plate: '',
-			from: moment().subtract(4, 'hour').toISOString(),
+			from: moment().subtract(duration, 'hour').toISOString(),
 			to: moment().toISOString(),
 			devices: [],
 			hitTypes: ['5c559fa676611bbbf1949033', '5dd4e9f98d48fa001afb8a14', '5c559fcc76611bbbf1949035', '5ca5fbf54c7c1f020f8f3c3b', '5c55a00c76611bbbf1949038', '5d43dc3e6c9f410011ab3233', '5c559f6d76611bbbf1949031', '5c52d1bcdbaf407788e73eb7'],
@@ -73,7 +88,7 @@ const store = new Vuex.Store({
 				.splice(0, 10);
 
 			const labels = [];
-			const makeChartData = [];
+			const makeChartDataSet = [];
 			let confidenceTotal = 0;
 			let total = 0;
 
@@ -88,7 +103,7 @@ const store = new Vuex.Store({
 
 			vehicleMakeData.forEach(element => {
 				labels.push(element.key);
-				makeChartData.push(element.values.length);
+				makeChartDataSet.push(element.values.length);
 				total += element.values.length;
 				const array = [];
 
@@ -99,22 +114,31 @@ const store = new Vuex.Store({
 				vehiclesOverTimeRawData.push({ make: element.key, values: array });
 			});
 
-			state.vehiclesOverTimeData = {
+			const maxImagePageSize = Math.ceil(state.vehicleData.length / imagePageSize);
+			store.commit('updateMaxImagePageSize', maxImagePageSize);
+
+			store.commit('updateVehicleTotal', total);
+
+			const avgMakeConfidence = (confidenceTotal / total).toFixed(2);
+			store.commit('updateAvgMakeConfidence', avgMakeConfidence);
+
+			const vehiclesOverTimeData = {
 				labels: hourLabels,
-				datasets: getVehiclesOverTimeData(vehiclesOverTimeRawData)
+				datasets: getVehiclesOverTimeData(vehiclesOverTimeRawData, hourLabels)
 			};
 
-			state.makeChartData = {
+			store.commit('updateVehiclesOverTimeData', vehiclesOverTimeData);
+
+			const makeChartData = {
 				labels,
 				datasets: [{
 					backgroundColor,
 					borderColor,
-					data: makeChartData
+					data: makeChartDataSet
 				}]
 			};
 
-			state.vehicleTotal = total;
-			state.avgMakeConfidence = (confidenceTotal / total).toFixed(2);
+			store.commit('updateMakeChartData', makeChartData);
 
 			/*
 				get an array of objects where the key of each object is plate number and the
@@ -132,23 +156,57 @@ const store = new Vuex.Store({
 				.reverse()
 				.splice(0, 1);
 
-			state.mostPopularPlate = plateData[0].key;
+			store.commit('updateMostPopularPlate', plateData[0].key);
 
-			state.maxImagePageSize = Math.ceil(state.vehicleData.length / imagePageSize);
-			store.commit('updateImageData');
+			const startIndex = (store.state.currentImagePage - 1) * imagePageSize;
+			const endIndex = store.state.currentImagePage * imagePageSize;
+
+			const imageData = state.vehicleData
+				.slice(startIndex, endIndex)
+				.map(vehicle => ({
+					id: vehicle.id,
+					info: vehicle.vehicleColour + ' ' + vehicle.plate,
+					url: vehicle.image
+				}));
+			store.commit('updateImageData', imageData);
+		},
+		updateMaxImagePageSize (state, maxImagePageSize) {
+			state.maxImagePageSize = maxImagePageSize;
+		},
+		updateVehicleTotal (state, total) {
+			state.vehicleTotal = total;
+		},
+		updateAvgMakeConfidence (state, avgMakeConfidence) {
+			state.avgMakeConfidence = avgMakeConfidence;
+		},
+		updateMostPopularPlate (state, plate) {
+			state.mostPopularPlate = plate;
+		},
+		updateVehiclesOverTimeData (state, vehiclesOverTimeData) {
+			state.vehiclesOverTimeData = vehiclesOverTimeData;
+		},
+		updateMakeChartData (state, makeChartData) {
+			state.makeChartData = makeChartData;
 		},
 		updateTableStatus (state, isTableShown) {
 			state.isTableShown = isTableShown;
 		},
-		updateImageData (state) {
-			const startIndex = (store.state.currentImagePage - 1) * imagePageSize;
-			const endIndex = store.state.currentImagePage * imagePageSize;
-
-			state.imageData = state.vehicleData.slice(startIndex, endIndex).map(vehicle => ({ id: vehicle.id, url: vehicle.image }));
+		updateImageData (state, imageData) {
+			state.imageData = imageData;
 		},
 		updateCurrentImagePage (state, page) {
 			state.currentImagePage = page;
-			store.commit('updateImageData');
+
+			const startIndex = (store.state.currentImagePage - 1) * imagePageSize;
+			const endIndex = store.state.currentImagePage * imagePageSize;
+			const imageData = state.vehicleData
+				.slice(startIndex, endIndex)
+				.map(vehicle => ({
+					id: vehicle.id,
+					info: vehicle.vehicleColour + ' ' + vehicle.plate,
+					url: vehicle.image
+				}));
+			store.commit('updateImageData', imageData);
 		}
 	},
 	actions: {

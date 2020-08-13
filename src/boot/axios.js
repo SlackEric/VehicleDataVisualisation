@@ -3,7 +3,8 @@ import axios from 'axios';
 const axiosInstance = axios.create({
 	baseURL: 'https://testing-api.aeroranger.com',
 	headers: {
-		'Content-Type': 'application/json'
+		'Content-Type': 'application/json',
+		'Access-Control-Allow-Origin': '*'
 	}
 });
 

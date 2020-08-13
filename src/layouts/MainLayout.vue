@@ -3,7 +3,7 @@
 	<q-header elevated>
 		<q-toolbar inset>
 			<q-space/>
-			<q-input dense v-model="plateNumber" label="Plate" bg-color="white">
+			<q-input dense @keydown.enter.prevent="doSearch" v-model="plateNumber" label="Plate" bg-color="white">
 				<template v-slot:append>
 					<q-btn @click="doSearch" icon="search"/>
 				</template>
